@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 
@@ -28,6 +29,17 @@ func NewClient(url string, httpClient *http.Client) *Client {
 		url:        url,
 		httpClient: httpClient,
 	}
+}
+
+// Post issues a POST request via the Do function.
+func Post(ctx context.Context, client *http.Client, url string, bodyType string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequest("POST", url, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", bodyType)
+	req.Header.Set("Accept", "application/vnd.github.starfox-preview")
+	return ctxhttp.Do(ctx, client, req)
 }
 
 // Query executes a single GraphQL query request,
